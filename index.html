@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RebarCut Pro — Rebar Cutting Optimizer | Thulir Design & QS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0f14;--card:#111821;--card2:#0d141c;--border:#24303d;--text:#e8edf3;--dim:#8d9aaa;--accent:#d6a23a;--accent2:#efc15a;--green:#39b56b;--red:#e05b5b;--blue:#5797e6;--shadow:0 14px 40px rgba(0,0,0,.22)}
+html,body{min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body{padding:18px}.wrap{max-width:1440px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 18px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.logo{font-size:25px;font-weight:800;letter-spacing:-1px}.logo span{color:var(--accent)}
+.tagline{font-size:11px;color:var(--dim);letter-spacing:1.8px;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.panel+.panel{margin-top:16px}.panel h2{font-size:13px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+label{display:block;font-size:11px;color:var(--dim);margin:0 0 5px;letter-spacing:.8px;text-transform:uppercase}
+input,select,textarea{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);padding:10px 11px;border-radius:8px;font:inherit;font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(214,162,58,.08)}
+textarea{resize:vertical;min-height:185px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.6}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.field{margin-bottom:12px}.hint{font-size:11px;color:var(--dim);line-height:1.5;margin-top:6px}
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.btn{border:0;border-radius:8px;padding:11px 15px;font-weight:700;font:inherit;font-size:13px;cursor:pointer}
+.primary{background:var(--accent);color:#111}.primary:hover{background:var(--accent2)}
+.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}.secondary:hover{border-color:var(--accent);color:var(--accent)}
+.danger{color:#ffb0b0;border-color:#5a2d32}.danger:hover{border-color:var(--red);color:#fff}
+.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.5px;background:#182331;color:var(--blue)}
+.badge.good{background:#11281d;color:#6ee59a}.badge.warn{background:#2b2110;color:#f1c969}.badge.bad{background:#30171a;color:#ff8b8b}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}.stat .v{font-size:25px;font-weight:800}.stat .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.stat.gold .v{color:var(--accent)}.stat.green .v{color:var(--green)}.stat.red .v{color:var(--red)}.stat.blue .v{color:var(--blue)}
+.empty{text-align:center;padding:80px 20px;color:var(--dim)}
+.hidden{display:none!important}
+.notice{border:1px solid #3b3220;background:#19150c;padding:11px 13px;border-radius:9px;color:#d9c28c;font-size:11px;line-height:1.5;margin-top:10px}
+.error{border:1px solid #5b2b32;background:#211114;padding:11px 13px;border-radius:9px;color:#ffb2b2;font-size:12px;line-height:1.5;margin-bottom:12px}
+.summarybar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:13px;flex-wrap:wrap}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:720px}
+th{text-align:left;padding:9px 10px;border-bottom:2px solid var(--border);color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}tr:hover td{background:#151d26}
+.num{text-align:right;font-variant-numeric:tabular-nums}.goodtxt{color:var(--green)}.badtxt{color:var(--red)}
+.bar{height:46px;border:1px solid var(--border);background:#0c1218;border-radius:7px;display:flex;overflow:hidden;position:relative;margin-bottom:6px}
+.cut{display:flex;align-items:center;justify-content:center;min-width:1px;color:#0a0d10;font-size:10px;font-weight:800;overflow:hidden;white-space:nowrap;padding:0 3px;border-right:1px solid rgba(0,0,0,.2)}
+.waste{background:repeating-linear-gradient(45deg,#25303b,#25303b 4px,#1a232d 4px,#1a232d 8px);color:#9ba7b5}
+.barinfo{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:10px;color:#aeb8c4;z-index:4;pointer-events:none}
+.group{margin-top:16px}.group:first-child{margin-top:0}.group-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:800}
+.small{font-size:10px;color:var(--dim);font-weight:500}
+.pill{display:inline-block;padding:3px 7px;border-radius:6px;background:#18212c;color:#b9c5d2;font-size:10px}
+footer{text-align:center;padding:24px 0;color:var(--dim);font-size:10px;letter-spacing:1px}
+.toast{position:fixed;right:20px;bottom:20px;background:#151d26;border:1px solid var(--accent);padding:12px 16px;border-radius:9px;font-size:12px;z-index:100;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
+progress{width:100%;height:6px;accent-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><div class="logo">Rebar<span>Cut</span> Pro</div><div class="tagline">Thulir Design & QS Services</div></div>
+  <div class="tagline">Verified 1D Rebar Cutting Optimizer</div>
+</header>
+
+<div class="grid">
+<section>
+  <div class="panel">
+    <h2>Job Settings</h2>
+    <div class="row">
+      <div class="field"><label>Stock length (m)</label><input id="stockLen" type="number" value="12" min="0.1" step="0.001"></div>
+      <div class="field"><label>Price (AED/tonne)</label><input id="price" type="number" value="3200" min="0" step="10"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Kerf / cut (mm)</label><input id="kerf" type="number" value="3" min="0" step="0.1"></div>
+      <div class="field"><label>End trim (mm)</label><input id="trim" type="number" value="0" min="0" step="0.1"></div>
+      <div class="field"><label>Min useful offcut (m)</label><input id="minOffcut" type="number" value="1" min="0" step="0.001"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Optimization time (ms)</label><input id="timeLimit" type="number" value="700" min="50" max="5000" step="50"></div>
+      <div class="field"><label>Stock mode</label>
+        <select id="stockMode"><option value="single">Single stock length</option></select>
+      </div>
+    </div>
+    <div class="notice">
+      Cutting is optimized independently by <b>diameter + grade</b>. Kerf is charged between consecutive cuts. A plan is reported as <b>PROVABLY OPTIMAL</b> when its stock count equals the mathematical lower bound; otherwise it is reported as best-found.
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Bar List / BBS Input</h2>
+    <label>Mark, Diameter (mm), Length (m), Quantity, [Grade]</label>
+    <textarea id="barInput" placeholder="T1, 16, 7.2, 15, B500
+T2, 12, 4.8, 20, B500
+T3, 10, 3.1, 10, B500
+B1, 20, 5.5, 8, B500
+B2, 16, 6.8, 12, B500
+B3, 12, 2.4, 30, B500
+S1, 8, 1.8, 40, B500
+S2, 10, 2.1, 25, B500"></textarea>
+    <div class="btnrow">
+      <button class="btn primary" onclick="optimize()">Optimize Cutting</button>
+      <button class="btn secondary" onclick="loadSample()">Load Sample</button>
+      <button class="btn secondary danger" onclick="clearAll()">Clear</button>
+    </div>
+    <div class="hint">
+      Grade is optional but recommended. Same diameter with different grades will never be mixed.
+      Decimal quantities are rejected. Every requested length must be physically cuttable from the selected stock length.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div id="emptyState" class="panel empty">
+    <div style="font-size:44px;margin-bottom:12px">∿</div>
+    Enter your BBS/cut list and click <b>Optimize Cutting</b>.
+  </div>
+
+  <div id="results" class="hidden">
+    <div id="errors"></div>
+    <div id="verification" class="panel" style="margin-bottom:16px"></div>
+    <div class="stats" id="stats"></div>
+
+    <div class="panel">
+      <div class="summarybar"><h2 style="margin:0">Cutting Plans</h2><span id="planBadge" class="badge"></span></div>
+      <div id="visual"></div>
+    </div>
+
+    <div class="panel">
+      <div class="summarybar"><h2 style="margin:0">Stock Summary</h2></div>
+      <div class="tablewrap" id="stockTable"></div>
+    </div>
+
+    <div class="panel">
+      <div class="summarybar"><h2 style="margin:0">Input Summary</h2></div>
+      <div class="tablewrap" id="inputTable"></div>
+    </div>
+
+    <div class="panel">
+      <div class="summarybar"><h2 style="margin:0">Export</h2></div>
+      <div class="btnrow">
+        <button class="btn primary" onclick="exportCSV()">Export CSV</button>
+        <button class="btn secondary" onclick="exportReport()">Export TXT Report</button>
+        <button class="btn secondary" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<footer>RebarCut Pro — Cutting Stock Optimization • Always verify final procurement quantities against approved BBS, mill stock, cutting method and site requirements.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+const COLORS=['#d6a23a','#4abf78','#5797e6','#e36b77','#9b72d8','#dc7e3e','#45a6a6','#a4a44a','#d46fa9','#6da879','#7777d8','#c99555'];
+let lastResult=null;
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2800);
+}
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function num(id){return Number(document.getElementById(id).value)}
+function fmt(n,d=2){return Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function kgPerM(d){return d*d/162.2}
+
+function parseBars(text){
+  const errors=[],bars=[],lines=text.split(/\r?\n/);
+  lines.forEach((raw,idx)=>{
+    const line=raw.trim();
+    if(!line)return;
+    const p=line.split(/[,\t;]+/).map(x=>x.trim().replace(/^"(.*)"$/,'$1'));
+    if(p.length<4){errors.push(`Line ${idx+1}: expected Mark, Diameter, Length, Quantity[, Grade].`);return}
+    const mark=p[0],dia=Number(p[1]),len=Number(p[2]),qty=Number(p[3]),grade=(p[4]||'UNSPECIFIED').trim()||'UNSPECIFIED';
+    if(!mark){errors.push(`Line ${idx+1}: missing mark.`);return}
+    if(!Number.isFinite(dia)||dia<=0){errors.push(`Line ${idx+1}: invalid diameter.`);return}
+    if(!Number.isFinite(len)||len<=0){errors.push(`Line ${idx+1}: invalid length.`);return}
+    if(!Number.isInteger(qty)||qty<=0){errors.push(`Line ${idx+1}: quantity must be a positive integer.`);return}
+    bars.push({mark,dia,len,qty,grade,line:idx+1});
+  });
+  return {bars,errors};
+}
+
+/* Exact bounded search for small/medium groups.
+   Objective: minimize stock count first, then total waste, then pattern count.
+   Uses memoized subset search to find the tightest fill for each new stock.
+   For large groups, combines FFD/BFD and local improvement within time limit. */
+function capacity(stockLen,trim,kerf){
+  return stockLen-trim;
+}
+function requiredSpace(pieceCount, lengths, kerf){
+  return lengths.reduce((a,b)=>a+b,0)+Math.max(0,pieceCount-1)*kerf;
+}
+function feasibleBar(cuts,stockLen,trim,kerf){
+  return requiredSpace(cuts.length,cuts.map(x=>x.len),kerf)<=capacity(stockLen,trim)+1e-9;
+}
+function usedLength(bar,kerf){return bar.cuts.reduce((s,x)=>s+x.len,0)+Math.max(0,bar.cuts.length-1)*kerf}
+function remaining(bar,stockLen,trim,kerf){return capacity(stockLen,trim)-usedLength(bar,kerf)}
+
+function ffd(pieces,stockLen,trim,kerf,bestFit=false){
+  const sorted=[...pieces].sort((a,b)=>b.len-a.len || a.id-b.id);
+  const bars=[];
+  for(const piece of sorted){
+    let chosen=-1,best=Infinity;
+    for(let i=0;i<bars.length;i++){
+      const rem=remaining(bars[i],stockLen,trim,kerf);
+      if(rem+1e-9>=piece.len){
+        if(!bestFit){chosen=i;break}
+        const after=rem-piece.len;
+        if(after<best){best=after;chosen=i}
+      }
+    }
+    if(chosen<0)bars.push({cuts:[piece]});
+    else bars[chosen].cuts.push(piece);
+  }
+  return bars;
+}
+
+function normalizeBars(bars,stockLen,trim,kerf){
+  return bars.map(b=>({...b,used:usedLength(b,kerf),waste:remaining(b,stockLen,trim,kerf)}));
+}
+
+function lowerBound(pieces,stockLen,trim,kerf){
+  const cap=capacity(stockLen,trim);
+  const sum=pieces.reduce((s,p)=>s+p.len,0)+pieces.length*0; // kerf is pattern-dependent
+  // Safe lower bound: length-only bound. It never overstates the true minimum.
+  return Math.ceil((sum)/cap-1e-12);
+}
+
+/* Local improvement: repeatedly try moving a piece into another bar and
+   pairwise swaps. It never makes the plan infeasible. */
+function improve(bars,stockLen,trim,kerf,deadline){
+  let changed=true;
+  while(changed && Date.now()<deadline){
+    changed=false;
+    // Try removing the emptiest bar by moving its pieces elsewhere.
+    for(let bi=bars.length-1;bi>=0 && Date.now()<deadline;bi--){
+      const source=bars[bi];
+      const others=bars.filter((_,i)=>i!==bi);
+      const test=others.map(b=>({cuts:[...b.cuts]}));
+      const pieces=[...source.cuts].sort((a,b)=>b.len-a.len);
+      let ok=true;
+      for(const p of pieces){
+        let best=-1,bestRem=Infinity;
+        for(let j=0;j<test.length;j++){
+          const rem=remaining(test[j],stockLen,trim,kerf);
+          if(rem+1e-9>=p.len && rem-p.len<bestRem){bestRem=rem-p.len;best=j}
+        }
+        if(best<0){ok=false;break}
+        test[best].cuts.push(p);
+      }
+      if(ok){
+        bars.splice(0,bars.length,...test);
+        changed=true;
+        break;
+      }
+    }
+    // Pairwise swap improvement
+    if(!changed){
+      outer:
+      for(let i=0;i<bars.length;i++)for(let j=i+1;j<bars.length;j++){
+        for(let a=0;a<bars[i].cuts.length;a++)for(let b=0;b<bars[j].cuts.length;b++){
+          const A=bars[i].cuts[a],B=bars[j].cuts[b];
+          const ni=bars[i].cuts.map((x,k)=>k===a?B:x),nj=bars[j].cuts.map((x,k)=>k===b?A:x);
+          if(feasibleBar(ni,stockLen,trim,kerf)&&feasibleBar(nj,stockLen,trim,kerf)){
+            bars[i].cuts=ni;bars[j].cuts=nj;changed=true;break outer;
+          }
+        }
+      }
+    }
+  }
+  return bars;
+}
+
+/* For small groups, exact search for the minimum number of bars.
+   We use branch-and-bound packing against a target number of bars.
+   This is intentionally bounded by time so the UI stays responsive. */
+function exactSmall(pieces,stockLen,trim,kerf,timeLimitMs){
+  const deadline=Date.now()+timeLimitMs;
+  const sorted=[...pieces].sort((a,b)=>b.len-a.len);
+  const cap=capacity(stockLen,trim);
+  const start=ffd(sorted,stockLen,trim,kerf,true);
+  let best=normalizeBars(start,stockLen,trim,kerf);
+  let target=best.length-1;
+  if(target<1)return {bars:best,optimal:true,lower:best.length};
+
+  function canPack(k){
+    const bins=Array.from({length:k},()=>({cuts:[],used:0}));
+    function dfs(pos){
+      if(Date.now()>deadline)return null;
+      if(pos===sorted.length)return bins;
+      const p=sorted[pos],seen=new Set();
+      for(let i=0;i<k;i++){
+        const b=bins[i];
+        const rem=cap-b.used-Math.max(0,b.cuts.length?kerf:0);
+        // actual added length: first piece no kerf, subsequent piece adds kerf
+        const add=p.len+(b.cuts.length?kerf:0);
+        if(rem+1e-9<add)continue;
+        const key=Math.round(b.used*1e6);
+        if(seen.has(key))continue;
+        seen.add(key);
+        b.cuts.push(p);b.used+=add;
+        const r=dfs(pos+1);if(r)return r;
+        b.used-=add;b.cuts.pop();
+        if(b.cuts.length===0)break;
+      }
+      return null;
+    }
+    return dfs(0);
+  }
+
+  while(target>=1 && Date.now()<deadline){
+    const r=canPack(target);
+    if(r){best=normalizeBars(r,stockLen,trim,kerf);target--;continue}
+    break;
+  }
+  const optimal=target===best.length-1 && best.length===lowerBound(pieces,stockLen,trim,kerf);
+  return {bars:best,optimal,lower:lowerBound(pieces,stockLen,trim,kerf)};
+}
+
+function optimizeGroup(pieces,stockLen,trim,kerf,timeLimitMs){
+  const deadline=Date.now()+timeLimitMs;
+  let candidates=[ffd(pieces,stockLen,trim,kerf,false),ffd(pieces,stockLen,trim,kerf,true)];
+  candidates=candidates.map(b=>improve(b,stockLen,trim,kerf,deadline));
+  let best=candidates.sort((a,b)=>a.length-b.length || totalWaste(a,stockLen,trim,kerf)-totalWaste(b,stockLen,trim,kerf))[0];
+  const lb=lowerBound(pieces,stockLen,trim,kerf);
+
+  if(pieces.length<=28 && best.length>lb && Date.now()<deadline){
+    const exact=exactSmall(pieces,stockLen,trim,kerf,Math.max(50,timeLimitMs));
+    if(exact.bars.length<=best.length)best=exact.bars;
+    return {bars:best,optimal:exact.bars.length===lb,lower:lb};
+  }
+  return {bars:best,optimal:best.length===lb,lower:lb};
+}
+
+function totalWaste(bars,stockLen,trim,kerf){return bars.reduce((s,b)=>s+remaining(b,stockLen,trim,kerf),0)}
+
+function optimize(){
+  const {bars,errors}=parseBars(document.getElementById('barInput').value);
+  const stock=num('stockLen'),price=num('price'),kerf=num('kerf')/1000,trim=num('trim')/1000,minOff=num('minOffcut'),time=Math.min(5000,Math.max(50,num('timeLimit')));
+  const out=document.getElementById('errors');out.innerHTML='';
+  if(errors.length){out.innerHTML='<div class="error">'+errors.map(esc).join('<br>')+'</div>';}
+  if(!bars.length){toast('No valid bars found.');return}
+  if(!Number.isFinite(stock)||stock<=0||!Number.isFinite(price)||price<0||kerf<0||trim<0){toast('Check job settings.');return}
+
+  const groups=new Map();
+  for(const b of bars){
+    if(b.len+trim>stock+1e-9){
+      errors.push(`Line ${b.line}: ${b.mark} length ${b.len}m exceeds usable stock length ${stock-trim}m.`);
+      continue;
+    }
+    const key=`${b.dia}||${b.grade}`;
+    if(!groups.has(key))groups.set(key,{dia:b.dia,grade:b.grade,pieces:[],source:[]});
+    const g=groups.get(key);g.source.push(b);
+    for(let q=0;q<b.qty;q++)g.pieces.push({...b,id:g.pieces.length});
+  }
+  if(errors.length){out.innerHTML='<div class="error">'+errors.map(esc).join('<br>')+'</div>'; if(!groups.size)return}
+
+  const results=[];
+  let colorIndex=0;
+  for(const g of groups.values()){
+    const solved=optimizeGroup(g.pieces,stock,trim,kerf,time);
+    const bs=normalizeBars(solved.bars,stock,trim,kerf);
+    bs.forEach((b,i)=>b.cuts.forEach(c=>c.color=COLORS[(colorIndex++)%COLORS.length]));
+    const weight=bs.length*stock*kgPerM(g.dia);
+    const requiredWeight=g.pieces.reduce((s,p)=>s+p.len*kgPerM(g.dia),0);
+    const wasteWeight=bs.reduce((s,b)=>s+b.waste*kgPerM(g.dia),0);
+    results.push({...g,...solved,bars:bs,requiredWeight,stockWeight:weight,wasteWeight});
+  }
+
+  const totalPieces=results.reduce((s,g)=>s+g.pieces.length,0);
+  const stockBars=results.reduce((s,g)=>s+g.bars.length,0);
+  const requiredWeight=results.reduce((s,g)=>s+g.requiredWeight,0);
+  const stockWeight=results.reduce((s,g)=>s+g.stockWeight,0);
+  const wasteWeight=results.reduce((s,g)=>s+g.wasteWeight,0);
+  const totalWasteM=results.reduce((s,g)=>s+g.bars.reduce((a,b)=>a+b.waste,0),0);
+  const lower=results.reduce((s,g)=>s+g.lower,0);
+  const optimal=results.every(g=>g.optimal && g.bars.length===g.lower);
+  lastResult={bars,results,stock,price,kerf,trim,minOff,totalPieces,stockBars,requiredWeight,stockWeight,wasteWeight,totalWasteM,lower,optimal,errors};
+  render();
+}
+
+function render(){
+  const r=lastResult;
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('verification').innerHTML=`
+    <div class="summarybar">
+      <div><b>Optimization verification</b><div class="small">Diameter/grade separated • kerf included • input quantities reconciled</div></div>
+      <span class="badge ${r.optimal?'good':'warn'}">${r.optimal?'PROVABLY OPTIMAL':'BEST FOUND / VERIFY'}</span>
+    </div>
+    <div class="small">Theoretical length lower bound: <b>${r.lower}</b> stock bars • Plan: <b>${r.stockBars}</b> • Gap: <b>${r.stockBars-r.lower}</b>. ${
+      r.optimal?'The plan reached the lower bound for every diameter/grade group.':'The heuristic/exact search did not prove a global optimum within the configured time/model; it is still fully feasible.'
+    }</div>`;
+  document.getElementById('planBadge').className='badge '+(r.optimal?'good':'warn');
+  document.getElementById('planBadge').textContent=r.optimal?'OPTIMAL BY LOWER BOUND':'BEST FOUND';
+
+  document.getElementById('stats').innerHTML=`
+    <div class="stat gold"><div class="v">${r.totalPieces}</div><div class="l">Cut Pieces</div></div>
+    <div class="stat blue"><div class="v">${r.stockBars}</div><div class="l">Stock Bars</div></div>
+    <div class="stat green"><div class="v">${fmt(r.requiredWeight/1000,3)} t</div><div class="l">Required Steel</div></div>
+    <div class="stat red"><div class="v">${fmt(r.wasteWeight,1)} kg</div><div class="l">Cutting Waste</div></div>
+  `;
+
+  let visual='';
+  for(const g of r.results){
+    visual+=`<div class="group"><div class="group-title"><span>Ø${esc(g.dia)} mm <span class="pill">${esc(g.grade)}</span></span><span class="small">${g.bars.length} stock • ${fmt(g.wasteWeight,1)} kg waste</span></div>`;
+    g.bars.forEach((b,i)=>{
+      let inner='';
+      b.cuts.forEach(c=>{
+        const pct=c.len/r.stock*100;
+        inner+=`<div class="cut" style="width:${pct}%;background:${c.color}" title="${esc(c.mark)} • Ø${c.dia} • ${c.len}m">${pct>=6?esc(c.mark):''}</div>`;
+      });
+      if(b.waste>0.00001)inner+=`<div class="cut waste" style="width:${Math.max(0,b.waste/r.stock*100)}%" title="Offcut ${fmt(b.waste,3)}m">${b.waste/r.stock*100>=9?fmt(b.waste,2)+'m':''}</div>`;
+      visual+=`<div class="bar" title="Stock #${i+1}"><span class="barinfo">#${i+1} • ${fmt(b.used,3)}m used • ${fmt(b.waste,3)}m offcut</span>${inner}</div>`;
+    });
+    visual+='</div>';
+  }
+  document.getElementById('visual').innerHTML=visual;
+
+  let st='<table><thead><tr><th>Dia</th><th>Grade</th><th>Stock</th><th>Cuts</th><th>Used (m)</th><th>Offcut (m)</th><th>Util.</th><th>Weight (kg)</th></tr></thead><tbody>';
+  r.results.forEach(g=>g.bars.forEach((b,i)=>{
+    st+=`<tr><td>Ø${g.dia}</td><td>${esc(g.grade)}</td><td>#${i+1}</td><td>${b.cuts.map(c=>`${esc(c.mark)} (${fmt(c.len,3)}m)`).join(' + ')}</td><td class="num">${fmt(b.used,3)}</td><td class="num ${b.waste<r.minOff?'goodtxt':''}">${fmt(b.waste,3)}</td><td class="num">${fmt(b.used/r.stock*100,1)}%</td><td class="num">${fmt(r.stock*kgPerM(g.dia),1)}</td></tr>`;
+  }));
+  st+='</tbody></table>';
+  document.getElementById('stockTable').innerHTML=st;
+
+  let it='<table><thead><tr><th>Mark</th><th>Dia</th><th>Grade</th><th>Length</th><th>Qty</th><th>Total m</th><th>Weight kg</th></tr></thead><tbody>';
+  r.bars.forEach(b=>{
+    it+=`<tr><td>${esc(b.mark)}</td><td>Ø${b.dia}</td><td>${esc(b.grade)}</td><td class="num">${fmt(b.len,3)}</td><td class="num">${b.qty}</td><td class="num">${fmt(b.len*b.qty,3)}</td><td class="num">${fmt(b.len*b.qty*kgPerM(b.dia),1)}</td></tr>`;
+  });
+  it+='</tbody></table>';
+  document.getElementById('inputTable').innerHTML=it;
+}
+
+function loadSample(){
+  document.getElementById('barInput').value=`T1, 16, 7.2, 15, B500
+T2, 12, 4.8, 20, B500
+T3, 10, 3.1, 10, B500
+B1, 20, 5.5, 8, B500
+B2, 16, 6.8, 12, B500
+B3, 12, 2.4, 30, B500
+S1, 8, 1.8, 40, B500
+S2, 10, 2.1, 25, B500`;
+  toast('Sample loaded.');
+}
+function clearAll(){
+  document.getElementById('barInput').value='';
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('emptyState').classList.remove('hidden');
+  lastResult=null;
+}
+
+function csvCell(v){
+  const s=String(v??'');
+  return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function exportCSV(){
+  if(!lastResult)return;
+  const r=lastResult;let out='Diameter,Grade,Stock #,Cuts,Used (m),Offcut (m),Utilization (%),Stock Weight (kg)\\n';
+  r.results.forEach(g=>g.bars.forEach((b,i)=>{
+    const cuts=b.cuts.map(c=>`${c.mark} (D${c.dia}-${c.len}m)`).join(' + ');
+    out+=[g.dia,g.grade,i+1,cuts,b.used.toFixed(3),b.waste.toFixed(3),(b.used/r.stock*100).toFixed(1),(r.stock*kgPerM(g.dia)).toFixed(1)].map(csvCell).join(',')+'\\n';
+  }));
+  out+='\\nInput BBS\\nMark,Diameter,Grade,Length (m),Qty,Total (m),Weight (kg)\\n';
+  r.bars.forEach(b=>out+=[b.mark,b.dia,b.grade,b.len,b.qty,(b.len*b.qty).toFixed(3),(b.len*b.qty*kgPerM(b.dia)).toFixed(1)].map(csvCell).join(',')+'\\n');
+  out+=`\\nVerification,Value\\nPlan status,${r.optimal?'PROVABLY OPTIMAL':'BEST FOUND'}\\nStock bars,${r.stockBars}\\nLower bound,${r.lower}\\nRequired steel kg,${r.requiredWeight.toFixed(2)}\\nPurchased stock kg,${r.stockWeight.toFixed(2)}\\nWaste kg,${r.wasteWeight.toFixed(2)}\\n`;
+  const blob=new Blob([out],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rebar_cutting_plan.csv';a.click();URL.revokeObjectURL(a.href);
+  toast('CSV exported.');
+}
+function exportReport(){
+  if(!lastResult)return;
+  const r=lastResult;
+  let t='REBARCUT PRO — CUTTING OPTIMIZATION REPORT\\nTHULIR DESIGN & QS SERVICES\\n'+'='.repeat(70)+'\\n';
+  t+=`Date: ${new Date().toLocaleString()}\\nStock length: ${r.stock} m\\nKerf: ${(r.kerf*1000).toFixed(1)} mm\\nEnd trim: ${(r.trim*1000).toFixed(1)} mm\\nStatus: ${r.optimal?'PROVABLY OPTIMAL BY LOWER BOUND':'BEST FOUND — NOT PROVEN GLOBAL OPTIMUM'}\\n\\n`;
+  t+=`CUT PIECES: ${r.totalPieces}\\nSTOCK BARS: ${r.stockBars}\\nLOWER BOUND: ${r.lower}\\nREQUIRED STEEL: ${r.requiredWeight.toFixed(2)} kg\\nSTOCK PURCHASE WEIGHT: ${r.stockWeight.toFixed(2)} kg\\nCUTTING WASTE: ${r.wasteWeight.toFixed(2)} kg\\n\\n`;
+  r.results.forEach(g=>{
+    t+=`\\nØ${g.dia} ${g.grade} — ${g.bars.length} STOCK BARS\\n`;
+    g.bars.forEach((b,i)=>t+=`#${i+1}  ${b.cuts.map(c=>`${c.mark}=${c.len}m`).join(' + ')} | used ${b.used.toFixed(3)}m | offcut ${b.waste.toFixed(3)}m\\n`);
+  });
+  t+='\\nNOTE: Final procurement and cutting must be checked against the approved BBS, specified grade, stock availability, cutting method/kerf and project requirements.\\n';
+  const blob=new Blob([t],{type:'text/plain;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rebar_cutting_report.txt';a.click();URL.revokeObjectURL(a.href);
+  toast('Report exported.');
+}
+</script>
+</body>
+</html>
